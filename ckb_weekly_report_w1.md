@@ -28,7 +28,7 @@
 ## Environment
 
 *   Set up a Node.js development environment for building CKB applications with CCC.
-*   Created the `my-ccc-app` react  project structure.
+*   Created the `my-ccc-app` react  project structure. using 'pnpm create ccc-app my-ccc-app'
 *   Encountered and began debugging issues with the `offCKB` local node setup.
 
 ## Images of Progress
