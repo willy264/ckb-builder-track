@@ -1,5 +1,6 @@
 # Builder Track Weekly Report — Week 3
 **Name:** Williams Akinwamide. 
+
 **Week Ending:** 01-19-2026
 
 ## Courses Completed
