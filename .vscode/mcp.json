@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"L1 Developer Training Course": {
+			"url": "https://nervos.gitbook.io/developer-training-course/~gitbook/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}
