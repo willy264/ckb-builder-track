@@ -146,4 +146,28 @@
 
 ## Images of Progress
 
-_Week 7 focused on CLI workflow and code/lab execution logs. No new screenshots were captured in the `images/` directory during this reporting period._
+_Week 7 progress across environment setup, offckb transaction flow, and Lumos/code labs:_
+
+**Node/offckb setup and environment debugging**
+
+![CKB Progress 39](./images/ckb39.PNG)
+![CKB Progress 40](./images/ckb40.PNG)
+![CKB Progress 41](./images/ckb41.PNG)
+![CKB Progress 42](./images/ckb42.PNG)
+
+**offckb commands, accounts, and transfer operations**
+
+![CKB Progress 43](./images/ckb43.PNG)
+![CKB Progress 44](./images/ckb44.PNG)
+
+**Project scaffolding and dependency installation logs**
+
+![CKB Progress 45](./images/ckb45.PNG)
+![CKB Progress 46](./images/ckb46.PNG)
+
+**Lumos walkthrough, outpoint discovery, and lab code execution**
+
+![CKB Progress 47](./images/ckb47.PNG)
+![CKB Progress 48](./images/ckb48.PNG)
+![CKB Progress 49](./images/ckb49.PNG)
+![CKB Progress 50](./images/ckb50.PNG)
