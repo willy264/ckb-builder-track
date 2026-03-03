@@ -1,63 +1,85 @@
-/* eslint-disable*/
 import React, { useEffect, useState } from "react";
 import { ccc } from "@ckb-ccc/connector-react";
 import { truncateAddress } from "../utils/stringUtils";
 
+const connectButtonClass =
+  "inline-flex items-center justify-center rounded-full border border-transparent bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:shadow-[0_12px_22px_rgba(15,157,141,0.28)]";
+
+const walletChipClass =
+  "inline-flex items-center gap-2.5 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 text-emerald-900 transition hover:-translate-y-0.5 hover:shadow-[0_10px_18px_rgba(11,127,115,0.16)]";
+
 const ConnectWallet: React.FC = () => {
-    const { open, wallet } = ccc.useCcc();
-    const [balance, setBalance] = useState<string>("");
-    const [address, setAddress] = useState<string>("");
-    const signer = ccc.useSigner();
+  const { open, wallet } = ccc.useCcc();
+  const signer = ccc.useSigner();
 
-    useEffect(() => {
-        if (!signer) {
-            return;
-          }
-      
-          (async () => {
-            const addr = await signer.getRecommendedAddress();
-            setAddress(addr);
-          })();
+  const [balance, setBalance] = useState("");
+  const [address, setAddress] = useState("");
 
-          (async () => {
-            const capacity = await signer.getBalance();
-            setBalance(ccc.fixedPointToString(capacity));
-          })();
+  useEffect(() => {
+    let cancelled = false;
 
-        return () => {
-            
-        };
-    }, [signer]);
-
-    const renderConnectWalletBtn = () => {
-        return <div className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base font-bold h-10 sm:h-12 px-4 sm:px-5"
-            onClick={open} >
-            Connect Wallet
-        </div>
+    if (!signer) {
+      setBalance("");
+      setAddress("");
+      return () => {
+        cancelled = true;
+      };
     }
 
-    const renderConnectedWalletInfo = () => {
-        return <div className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-        onClick={open} >
-            <div className="rounded-full mr-2">
-          {wallet && <img src={wallet.icon} alt="avatar" className="w-6 h-6" />}
-        </div>
-        <div>
-          <h2 className="text-sm font-semibold">
-            {balance} CKB
-          </h2>
-          <p className="text-xs flex items-center gap-2">
-            {truncateAddress(address, 10, 6)}
-          </p>
-        </div>
-    </div>
-    }
+    (async () => {
+      try {
+        const [addr, capacity] = await Promise.all([
+          signer.getRecommendedAddress(),
+          signer.getBalance(),
+        ]);
 
+        if (cancelled) return;
+        setAddress(addr);
+        setBalance(ccc.fixedPointToString(capacity));
+      } catch {
+        if (cancelled) return;
+        setAddress("");
+        setBalance("");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [signer]);
+
+  if (!wallet) {
     return (
-        <div className="flex">
-            {wallet ? renderConnectedWalletInfo() : renderConnectWalletBtn()}
-        </div>
+      <button type="button" className={connectButtonClass} onClick={open}>
+        Connect Wallet
+      </button>
     );
+  }
+
+  return (
+    <button type="button" className={walletChipClass} onClick={open}>
+      <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-emerald-100 bg-white text-xs font-bold text-emerald-700">
+        {wallet.icon ? (
+          <img
+            src={wallet.icon}
+            alt={`${wallet.name ?? "wallet"} icon`}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span>W</span>
+        )}
+      </span>
+
+      <span className="flex flex-col items-start leading-tight">
+        <span className="text-xs font-bold">
+          {balance !== "" ? `${balance} CKB` : "Loading balance..."}
+        </span>
+        <span className="text-[11px] text-emerald-800/80">
+          {address ? truncateAddress(address, 10, 6) : "Loading address..."}
+        </span>
+      </span>
+    </button>
+  );
 };
 
 export default ConnectWallet;
