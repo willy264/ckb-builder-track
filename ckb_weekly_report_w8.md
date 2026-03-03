@@ -174,64 +174,6 @@
 - Located two existing cells containing "Hello Nervos!" data and replaced their data with "Hello World!" and Lorem Ipsum content
 - Implemented conditional capacity collection and change cell creation for cases where output capacity exceeds input capacity
 
-#### Code Implementation (4 code blocks):
-
-**Block 1 — Locate input cells by data content:**
-```javascript
-const {hexString} = await readFileToHexString(DATA_FILE_1);
-const query = {lock: addressToScript(ADDRESS_1), type: null, data: hexString};
-const cellCollector = new CellCollector(indexer, query);
-for await (const cell of cellCollector.collect())
-{
-    transaction = transaction.update("inputs", (i)=>i.concat(cell));
-}
-```
-- Reads `HelloNervos.txt` to hex and queries for all cells owned by `ADDRESS_1` that contain that exact data
-- Iterates through all matching cells and adds each as a transaction input
-
-**Block 2 — Create output cells with new data:**
-```javascript
-const DATA_FILEs = [DATA_FILE_2, DATA_FILE3];
-for(const DATA_FILE of DATA_FILEs)
-{
-    const {hexString} = await readFileToHexString(DATA_FILE);
-    const outputCapacity = intToHex(ckbytesToShannons(61n) + ckbytesToShannons(BigInt((hexString.length - 2) / 2)));
-    const output = {cellOutput: {capacity: outputCapacity, lock: addressToScript(ADDRESS_1), type: null}, data: hexString};
-    transaction = transaction.update("outputs", (i)=>i.push(output));
-}
-```
-- Loops over `HelloWorld.txt` and `LoremIpsum.txt`, creating properly-sized output cells for each
-
-**Block 3 — Conditional capacity collection:**
-```javascript
-let inputCapacity = transaction.inputs.toArray().reduce((a, c)=>a+hexToInt(c.cellOutput.capacity), 0n);
-let outputCapacity = transaction.outputs.toArray().reduce((a, c)=>a+hexToInt(c.cellOutput.capacity), 0n);
-
-let capacityRequired = outputCapacity - inputCapacity + TX_FEE;
-if(capacityRequired !== 0n && capacityRequired > ckbytesToShannons(-61n))
-{
-    capacityRequired += ckbytesToShannons(61n);
-    const {inputCells} = await collectCapacity(indexer, addressToScript(ADDRESS_1), capacityRequired);
-    transaction = transaction.update("inputs", (i)=>i.concat(inputCells));
-}
-```
-- Calculates the capacity deficit (outputs + fee - inputs)
-- Only collects additional cells if the deficit is real and large enough to warrant a change cell (minimum 61 CKBytes)
-
-**Block 4 — Conditional change cell creation:**
-```javascript
-inputCapacity = transaction.inputs.toArray().reduce((a, c)=>a+hexToInt(c.cellOutput.capacity), 0n);
-
-if(inputCapacity - outputCapacity - TX_FEE > 0n)
-{
-    const changeCellCapacity = intToHex(inputCapacity - outputCapacity - TX_FEE);
-    const output2 = {cellOutput: {capacity: changeCellCapacity, lock: addressToScript(ADDRESS_1), type: null}, data: "0x"};
-    transaction = transaction.update("outputs", (i)=>i.push(output2));
-}
-```
-- Recalculates input capacity after potential additional cell collection
-- Creates a change cell only if there is excess capacity after covering outputs and fee
-
 #### Transaction Structure:
 
 - **Input 1:** Cell containing "Hello Nervos!" data (consumed/destroyed)
@@ -271,4 +213,8 @@ if(inputCapacity - outputCapacity - TX_FEE > 0n)
 
 _Week 8 progress across cell collection, data storage, and data update labs:_
 
-<!-- Add screenshots of lab execution results here -->
+**Lab transaction completions**
+
+![CKB Progress 51](./images/ckb51.PNG)
+![CKB Progress 52](./images/ckb52.PNG)
+![CKB Progress 53](./images/ckb53.PNG)
