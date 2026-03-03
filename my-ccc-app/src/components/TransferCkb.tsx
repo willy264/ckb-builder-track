@@ -21,6 +21,7 @@ function parseFeeRate(value: string): number {
 }
 
 const TransferCkb: React.FC = () => {
+  const { client } = ccc.useCcc();
   const signer = ccc.useSigner();
 
   const [toAddress, setToAddress] = useState("");
@@ -34,6 +35,10 @@ const TransferCkb: React.FC = () => {
     return !!signer && toAddress.trim() !== "" && amount.trim() !== "" && !busy;
   }, [signer, toAddress, amount, busy]);
 
+  const isMainnet = useMemo(() => client.addressPrefix === "ckb", [client]);
+  const networkName = isMainnet ? "Mainnet" : "Testnet";
+  const requiredAddressPrefix = isMainnet ? "ckb1" : "ckt1";
+
   const statusTone = useMemo(() => {
     const base =
       "inline-flex items-center justify-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em]";
@@ -45,16 +50,27 @@ const TransferCkb: React.FC = () => {
   }, [busy, status]);
 
   const txExplorerLink = useMemo(() => {
-    if (!txHash || !signer) return "";
+    if (!txHash) return "";
     const base =
-      signer.client.addressPrefix === "ckb"
+      isMainnet
         ? "https://explorer.nervos.org/transaction/"
         : "https://testnet.explorer.nervos.org/transaction/";
     return `${base}${txHash}`;
-  }, [txHash, signer]);
+  }, [isMainnet, txHash]);
+
+  const hasValidNetworkPrefix = (value: string) => {
+    const normalized = value.trim().toLowerCase();
+    return normalized.startsWith(requiredAddressPrefix);
+  };
 
   const handleMaxAmount = async () => {
     if (!signer || busy || toAddress.trim() === "") return;
+    if (!hasValidNetworkPrefix(toAddress)) {
+      setStatus(
+        `Max amount failed: ${networkName} address required. Expected prefix "${requiredAddressPrefix}".`
+      );
+      return;
+    }
 
     try {
       setBusy(true);
@@ -90,6 +106,12 @@ const TransferCkb: React.FC = () => {
 
   const handleTransfer = async () => {
     if (!signer || !canSend) return;
+    if (!hasValidNetworkPrefix(toAddress)) {
+      setStatus(
+        `Transfer failed: ${networkName} address required. Expected prefix "${requiredAddressPrefix}".`
+      );
+      return;
+    }
 
     try {
       setBusy(true);
@@ -133,6 +155,9 @@ const TransferCkb: React.FC = () => {
           <p className="mt-1 text-sm text-slate-600">
             Compose, fund, sign, submit, and confirm in one flow with CCC.
           </p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+            Active network: {networkName}
+          </p>
         </div>
         <span className={statusTone}>{busy ? "Processing" : "Ready"}</span>
       </div>
@@ -142,7 +167,7 @@ const TransferCkb: React.FC = () => {
           <span>Recipient Address</span>
           <input
             className={inputClass}
-            placeholder="ckt1..."
+            placeholder={`${requiredAddressPrefix}...`}
             value={toAddress}
             onChange={(e) => setToAddress(e.target.value)}
           />

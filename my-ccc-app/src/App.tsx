@@ -1,5 +1,6 @@
 import React from "react";
 import ConnectWallet from "./components/ConnectWallet";
+import NetworkSelector from "./components/NetworkSelector";
 import TransferCkb from "./components/TransferCkb";
 
 const highlights = [
@@ -37,6 +38,7 @@ function App() {
                 tracking.
               </p>
               <div className="flex flex-wrap items-center gap-3">
+                <NetworkSelector />
                 <ConnectWallet />
                 <a
                   className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white/90 px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-white"
@@ -47,6 +49,9 @@ function App() {
                   Read CCC Docs
                 </a>
               </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.09em] text-slate-500">
+                Transfer panel below uses the selected network.
+              </p>
             </div>
 
             <div className="relative flex min-h-[220px] items-center justify-center">

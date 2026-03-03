@@ -9,8 +9,9 @@ const walletChipClass =
   "inline-flex items-center gap-2.5 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-3 py-2 text-emerald-900 transition hover:-translate-y-0.5 hover:shadow-[0_10px_18px_rgba(11,127,115,0.16)]";
 
 const ConnectWallet: React.FC = () => {
-  const { open, wallet } = ccc.useCcc();
+  const { open, wallet, client } = ccc.useCcc();
   const signer = ccc.useSigner();
+  const networkLabel = client.addressPrefix === "ckb" ? "Mainnet" : "Testnet";
 
   const [balance, setBalance] = useState("");
   const [address, setAddress] = useState("");
@@ -75,7 +76,9 @@ const ConnectWallet: React.FC = () => {
           {balance !== "" ? `${balance} CKB` : "Loading balance..."}
         </span>
         <span className="text-[11px] text-emerald-800/80">
-          {address ? truncateAddress(address, 10, 6) : "Loading address..."}
+          {address
+            ? `${networkLabel} - ${truncateAddress(address, 10, 6)}`
+            : `Loading ${networkLabel} address...`}
         </span>
       </span>
     </button>
